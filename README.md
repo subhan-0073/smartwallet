@@ -85,13 +85,13 @@ SmartWallet is designed to help users:
 - [x] Clean boilerplate and organize folders
 - [x] Set up Git repository and push initial commit
 
-### 🏠 Milestone 2: Home Screen UI ⏳
+### 🏠 Milestone 2: Home Screen UI ✅
 
 > Build the interface to display expenses
 
-- [ ] Create static UI with top bar and expense list
-- [ ] Build reusable `ExpenseTile` widget
-- [ ] Show mock expenses for layout testing
+- [x] Create static UI with top bar and expense list
+- [x] Build reusable `ExpenseTile` widget
+- [x] Show mock expenses for layout testing
 
 ### ✍️ Milestone 3: Add Expense Form ⏳
 
