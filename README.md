@@ -93,21 +93,16 @@ SmartWallet is designed to help users:
 - [x] Build reusable `ExpenseTile` widget
 - [x] Show mock expenses for layout testing
 
-### ✍️ Milestone 3: Add Expense Form ⏳
+### ✍️ Milestone 3: Add Expense Form & State Management ✅
 
-> Add a screen to input new expense data
+> Add a screen to input new expense data and dynamically update the expense list
 
-- [ ] Create form with fields for amount, category, note, and date
-- [ ] Add form validation and navigation
+- [x] Create form with fields for amount, category, note, and date
+- [x] Add form validation and navigation
+- [x] Use `setState` to reflect newly added expenses
+- [x] Route between home screen and add expense screen
 
-### 🔄 Milestone 4: State Management ⏳
-
-> Dynamically update the expense list
-
-- [ ] Use `setState` to reflect newly added expenses
-- [ ] Route between home screen and add expense screen
-
-### 💾 Milestone 5: SQLite Integration ⏳
+### 💾 Milestone 4: SQLite Integration ⏳
 
 > Store expenses persistently on the device
 
@@ -115,21 +110,21 @@ SmartWallet is designed to help users:
 - [ ] Create `database_helper.dart` to handle CRUD operations
 - [ ] Load and display saved expenses at startup
 
-### 🗑️ Milestone 6: Deletion Functionality ⏳
+### 🗑️ Milestone 5: Deletion Functionality ⏳
 
 > Allow users to manage and delete entries
 
 - [ ] Swipe to delete an expense
 - [ ] Long-press to show delete confirmation
 
-### 🎨 Milestone 7: UI Polish ⏳
+### 🎨 Milestone 6: UI Polish ⏳
 
 > Improve user interface for better UX
 
 - [ ] Apply consistent spacing, fonts, and padding
 - [ ] Finalize app theme with clean and minimal look
 
-### 🔮 Milestone 8: Future-Ready Setup ⏳
+### 🔮 Milestone 7: Future-Ready Setup ⏳
 
 > Lay the groundwork for upcoming features
 
