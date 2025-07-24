@@ -102,13 +102,13 @@ SmartWallet is designed to help users:
 - [x] Use `setState` to reflect newly added expenses
 - [x] Route between home screen and add expense screen
 
-### 💾 Milestone 4: SQLite Integration ⏳
+### 💾 Milestone 4: SQLite Integration ✅
 
 > Store expenses persistently on the device
 
-- [ ] Add and configure `sqflite` and `path_provider`
-- [ ] Create `database_helper.dart` to handle CRUD operations
-- [ ] Load and display saved expenses at startup
+- [x] Add and configure `sqflite` and `path_provider`
+- [x] Create `database_helper.dart` to handle CRUD operations
+- [x] Load and display saved expenses at startup
 
 ### 🗑️ Milestone 5: Deletion Functionality ⏳
 
