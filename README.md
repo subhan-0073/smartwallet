@@ -110,12 +110,12 @@ SmartWallet is designed to help users:
 - [x] Create `database_helper.dart` to handle CRUD operations
 - [x] Load and display saved expenses at startup
 
-### 🗑️ Milestone 5: Deletion Functionality ⏳
+### 🗑️ Milestone 5: Deletion Functionality ✅
 
 > Allow users to manage and delete entries
 
-- [ ] Swipe to delete an expense
-- [ ] Long-press to show delete confirmation
+- [x] Swipe to delete an expense
+- [x] Long-press to show delete confirmation
 
 ### 🎨 Milestone 6: UI Polish ⏳
 

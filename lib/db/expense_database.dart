@@ -41,8 +41,15 @@ class ExpenseDatabase {
   Future<List<Expense>> getExpenses() async {
     final db = await instance.database;
     final List<Map<String, dynamic>> maps = await db.query('expenses');
-    final List<Expense> expenses =
-        List.generate(maps.length, (i) => Expense.fromMap(maps[i]));
+    final List<Expense> expenses = List.generate(
+      maps.length,
+      (i) => Expense.fromMap(maps[i]),
+    );
     return expenses;
+  }
+
+  Future<void> deleteExpense(int id) async {
+    final db = await instance.database;
+    await db.delete('expenses', where: 'id = ?', whereArgs: [id]);
   }
 }
