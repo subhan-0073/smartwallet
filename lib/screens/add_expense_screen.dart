@@ -16,40 +16,87 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
   double? _amount;
   String? _category;
   String? _note;
-  DateTime? _selectedDate;
+  DateTime? _selectedDate = DateTime.now();
 
   final _formKey = GlobalKey<FormState>();
+  bool _isFormValid = false;
+
+  void _validateForm() {
+    final isValid = _formKey.currentState?.validate() ?? false;
+    setState(() {
+      _isFormValid = isValid && _selectedDate != null;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _amountController.addListener(_validateForm);
+    _categoryController.addListener(_validateForm);
+    _noteController.addListener(_validateForm);
+  }
+
+  @override
+  void dispose() {
+    _amountController.dispose();
+    _categoryController.dispose();
+    _noteController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Add Expense'),
-        actions: [IconButton(onPressed: () {}, icon: Icon(Icons.save))],
-      ),
+      appBar: AppBar(title: Text('Add Expense')),
       body: Form(
         key: _formKey,
         child: ListView(
           padding: EdgeInsets.all(16),
           children: [
+            Text(
+              'Enter expense details',
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+            const SizedBox(height: 24),
             TextFormField(
               controller: _amountController,
-              decoration: InputDecoration(labelText: 'Amount'),
+              decoration: InputDecoration(
+                labelText: 'Amount',
+                prefixIcon: const Icon(Icons.currency_rupee),
+                border: const OutlineInputBorder(),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
+              ),
               keyboardType: TextInputType.number,
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return 'Amount is required';
                 }
-                if (double.tryParse(value) == null) {
+                final parsed = double.tryParse(value);
+                if (parsed == null) {
                   return 'Invalid amount';
+                }
+                if (parsed <= 0) {
+                  return 'Amount must be greater than 0';
                 }
                 return null;
               },
               onSaved: (newValue) => _amount = double.tryParse(newValue ?? ''),
             ),
+            const SizedBox(height: 16),
             TextFormField(
               controller: _categoryController,
-              decoration: InputDecoration(labelText: 'Category'),
+              decoration: InputDecoration(
+                labelText: 'Category',
+                prefixIcon: const Icon(Icons.category),
+                border: const OutlineInputBorder(),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
+              ),
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return 'Category is required';
@@ -58,20 +105,46 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
               },
               onSaved: (newValue) => _category = newValue?.trim(),
             ),
+            const SizedBox(height: 16),
             TextFormField(
               controller: _noteController,
-              decoration: InputDecoration(labelText: 'Note'),
+              decoration: InputDecoration(
+                labelText: 'Note',
+                prefixIcon: const Icon(Icons.edit),
+                border: const OutlineInputBorder(),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
+              ),
+              maxLength: 100,
               validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Note is required';
+                if (value != null && value.length > 100) {
+                  return 'Note must be at most 100 characters';
                 }
                 return null;
               },
               onSaved: (newValue) => _note = newValue?.trim(),
             ),
             const SizedBox(height: 16),
-
-            ElevatedButton(
+            OutlinedButton.icon(
+              icon: const Icon(Icons.calendar_today),
+              label: Text(
+                _selectedDate == null
+                    ? 'Select Date'
+                    : 'Date: ${_selectedDate!.toLocal().toString().split(' ')[0]}',
+                style: Theme.of(context).textTheme.bodyLarge,
+              ),
+              style: OutlinedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 16,
+                  horizontal: 20,
+                ),
+                textStyle: Theme.of(context).textTheme.bodyLarge,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
               onPressed: () async {
                 final pickedDate = await showDatePicker(
                   context: context,
@@ -83,39 +156,56 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                   setState(() {
                     _selectedDate = pickedDate;
                   });
+                  _validateForm();
                 }
               },
-              child: Text(
-                _selectedDate == null
-                    ? 'Select Date'
-                    : 'Date: 	${_selectedDate!.toLocal().toString().split(' ')[0]}',
-              ),
             ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () {
-                if (_selectedDate == null) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Please pick a date')),
-                  );
-                  return;
-                }
-                final isValid = _formKey.currentState!.validate();
-                if (isValid) {
-                  _formKey.currentState?.save();
-
-                  Navigator.pop(
-                    context,
-                    Expense(
-                      amount: _amount ?? 0,
-                      category: _category ?? '',
-                      note: _note ?? '',
-                      date: _selectedDate!,
-                    ),
-                  );
-                }
-              },
-              child: Text('Add Expense'),
+            if (_selectedDate == null)
+              Padding(
+                padding: const EdgeInsets.only(top: 4, left: 8),
+                child: Text(
+                  'Date is required',
+                  style: TextStyle(color: Colors.red[700], fontSize: 13),
+                ),
+              ),
+            const SizedBox(height: 24),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                icon: const Icon(Icons.add),
+                label: const Text('Add Expense'),
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  textStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                onPressed: _isFormValid
+                    ? () {
+                        final isValid = _formKey.currentState!.validate();
+                        if (isValid) {
+                          _formKey.currentState?.save();
+                          Navigator.pop(
+                            context,
+                            Expense(
+                              amount: _amount ?? 0,
+                              category: _category ?? '',
+                              note: _note ?? '',
+                              date: _selectedDate!,
+                            ),
+                          );
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Expense added successfully!'),
+                            ),
+                          );
+                        }
+                      }
+                    : null,
+              ),
             ),
           ],
         ),

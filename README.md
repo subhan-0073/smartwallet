@@ -117,12 +117,14 @@ SmartWallet is designed to help users:
 - [x] Swipe to delete an expense
 - [x] Long-press to show delete confirmation
 
-### 🎨 Milestone 6: UI Polish ⏳
+### 🎨 Milestone 6: UI Polish ✅
 
 > Improve user interface for better UX
 
-- [ ] Apply consistent spacing, fonts, and padding
-- [ ] Finalize app theme with clean and minimal look
+- [x] Apply consistent spacing, fonts, and padding
+- [x] Finalize app theme with clean and minimal look
+- [x] Added theme.dart for centralized theme management
+- [x] Added theme toggle in AppBar
 
 ### 🔮 Milestone 7: Future-Ready Setup ⏳
 

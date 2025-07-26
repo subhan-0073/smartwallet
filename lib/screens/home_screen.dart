@@ -5,7 +5,14 @@ import '../widgets/expense_tile.dart';
 import '../db/expense_database.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final VoidCallback toggleTheme;
+  final ThemeMode currentThemeMode;
+
+  const HomeScreen({
+    super.key,
+    required this.toggleTheme,
+    required this.currentThemeMode,
+  });
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -49,6 +56,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _loadExpenses() async {
     final dbExpenses = await ExpenseDatabase.instance.getExpenses();
+
     if (dbExpenses.isEmpty) {
       await _insertMockData();
       final newDbExpenses = await ExpenseDatabase.instance.getExpenses();
@@ -74,14 +82,71 @@ class _HomeScreenState extends State<HomeScreen> {
     _loadExpenses();
   }
 
+  IconData _getThemeIcon() {
+    return widget.currentThemeMode == ThemeMode.light
+        ? Icons.dark_mode
+        : Icons.light_mode;
+  }
+
+  String _getThemeTooltip() {
+    return widget.currentThemeMode == ThemeMode.light
+        ? 'Switch to Dark Mode'
+        : 'Switch to Light Mode';
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Smart Wallet'), centerTitle: true),
+      appBar: AppBar(
+        title: const Text('Smart Wallet'),
+        centerTitle: true,
+        actions: [
+          IconButton(
+            icon: Icon(_getThemeIcon()),
+            onPressed: widget.toggleTheme,
+            tooltip: _getThemeTooltip(),
+          ),
+        ],
+      ),
       body: isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const CircularProgressIndicator(),
+                  const SizedBox(height: 24),
+                  Text(
+                    'Loading your expenses...',
+                    style: Theme.of(context).textTheme.bodyLarge,
+                  ),
+                ],
+              ),
+            )
           : expenses.isEmpty
-          ? const Center(child: Text('No expenses yet.'))
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.wallet_outlined,
+                    size: 64,
+                    color: Colors.grey[400],
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'No expenses yet!',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Tap the + button to add your first expense.',
+                    style: Theme.of(
+                      context,
+                    ).textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
+                  ),
+                ],
+              ),
+            )
           : ListView.builder(
               itemCount: expenses.length,
               itemBuilder: (context, index) {
@@ -109,8 +174,20 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     );
                   },
-                  onDismissed: (direction) {
-                    _deleteExpense(expense.id!);
+                  onDismissed: (direction) async {
+                    await _deleteExpense(expense.id!);
+                    if (!context.mounted) return;
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: const Text('Expense deleted'),
+                        action: SnackBarAction(
+                          label: 'Undo',
+                          onPressed: () async {
+                            await _addExpense(expense);
+                          },
+                        ),
+                      ),
+                    );
                   },
                   child: ExpenseTile(
                     amount: expense.amount,
