@@ -3,6 +3,7 @@ import '../screens/add_expense_screen.dart';
 import '../models/expense.dart';
 import '../widgets/expense_tile.dart';
 import '../db/expense_database.dart';
+import '../utils/dialogs.dart';
 
 class HomeScreen extends StatefulWidget {
   final VoidCallback toggleTheme;
@@ -82,6 +83,11 @@ class _HomeScreenState extends State<HomeScreen> {
     _loadExpenses();
   }
 
+  Future<void> _editExpense(Expense expense) async {
+    await ExpenseDatabase.instance.updateExpense(expense);
+    _loadExpenses();
+  }
+
   IconData _getThemeIcon() {
     return widget.currentThemeMode == ThemeMode.light
         ? Icons.dark_mode
@@ -92,6 +98,26 @@ class _HomeScreenState extends State<HomeScreen> {
     return widget.currentThemeMode == ThemeMode.light
         ? 'Switch to Dark Mode'
         : 'Switch to Light Mode';
+  }
+
+  void _showOptionsDialog(Expense expense) {
+    DialogUtils.showOptionsDialog(context, expense, _editExpense, (
+      expense,
+    ) async {
+      await _deleteExpense(expense.id!);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Expense deleted'),
+          action: SnackBarAction(
+            label: 'Undo',
+            onPressed: () async {
+              await _addExpense(expense);
+            },
+          ),
+        ),
+      );
+    });
   }
 
   @override
@@ -153,47 +179,95 @@ class _HomeScreenState extends State<HomeScreen> {
                 final expense = expenses[index];
                 return Dismissible(
                   key: Key(expense.id.toString()),
-                  confirmDismiss: (direction) async {
-                    return await showDialog(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        title: const Text('Delete Expense'),
-                        content: const Text(
-                          'Are you sure you want to delete this expense?',
+                  direction: DismissDirection.horizontal,
+                  background: Container(
+                    color: Theme.of(context).scaffoldBackgroundColor,
+                    alignment: Alignment.centerLeft,
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.edit, color: Colors.lightGreen, size: 28),
+                        SizedBox(width: 8),
+                        Text(
+                          'Edit',
+                          style: TextStyle(
+                            color: Colors.lightGreen,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                          ),
                         ),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(context, false),
-                            child: const Text('Cancel'),
+                      ],
+                    ),
+                  ),
+                  secondaryBackground: Container(
+                    color: Theme.of(context).scaffoldBackgroundColor,
+                    alignment: Alignment.centerRight,
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: const [
+                        Text(
+                          'Delete',
+                          style: TextStyle(
+                            color: Colors.redAccent,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
                           ),
-                          TextButton(
-                            onPressed: () => Navigator.pop(context, true),
-                            child: const Text('Delete'),
-                          ),
-                        ],
-                      ),
-                    );
+                        ),
+                        SizedBox(width: 8),
+                        Icon(Icons.delete, color: Colors.redAccent, size: 28),
+                      ],
+                    ),
+                  ),
+                  confirmDismiss: (direction) async {
+                    if (direction == DismissDirection.startToEnd) {
+                      // Edit
+                      final updatedExpense = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              AddExpenseScreen(expenseToEdit: expense),
+                        ),
+                      );
+                      if (updatedExpense != null && updatedExpense is Expense) {
+                        await _editExpense(updatedExpense);
+                      }
+                      return false;
+                    } else if (direction == DismissDirection.endToStart) {
+                      // Delete
+                      return await DialogUtils.showDeleteConfirmationDialog(
+                        context,
+                      );
+                    }
+                    return false;
                   },
                   onDismissed: (direction) async {
-                    await _deleteExpense(expense.id!);
-                    if (!context.mounted) return;
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: const Text('Expense deleted'),
-                        action: SnackBarAction(
-                          label: 'Undo',
-                          onPressed: () async {
-                            await _addExpense(expense);
-                          },
+                    if (direction == DismissDirection.endToStart) {
+                      await _deleteExpense(expense.id!);
+                      if (!context.mounted) return;
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: const Text('Expense deleted'),
+                          action: SnackBarAction(
+                            label: 'Undo',
+                            onPressed: () async {
+                              await _addExpense(expense);
+                            },
+                          ),
                         ),
-                      ),
-                    );
+                      );
+                    }
                   },
-                  child: ExpenseTile(
-                    amount: expense.amount,
-                    category: expense.category,
-                    note: expense.note,
-                    date: expense.date.toString().split(' ')[0],
+                  child: GestureDetector(
+                    onLongPress: () => _showOptionsDialog(expense),
+                    child: ExpenseTile(
+                      amount: expense.amount,
+                      category: expense.category,
+                      note: expense.note,
+                      date: expense.date.toString().split(' ')[0],
+                    ),
                   ),
                 );
               },

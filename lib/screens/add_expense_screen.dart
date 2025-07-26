@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import '../models/expense.dart';
 
 class AddExpenseScreen extends StatefulWidget {
-  const AddExpenseScreen({super.key});
+  final Expense? expenseToEdit;
+
+  const AddExpenseScreen({super.key, this.expenseToEdit});
 
   @override
   State<AddExpenseScreen> createState() => _AddExpenseScreenState();
@@ -20,6 +22,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
 
   final _formKey = GlobalKey<FormState>();
   bool _isFormValid = false;
+  bool get _isEditMode => widget.expenseToEdit != null;
 
   void _validateForm() {
     final isValid = _formKey.currentState?.validate() ?? false;
@@ -34,6 +37,15 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
     _amountController.addListener(_validateForm);
     _categoryController.addListener(_validateForm);
     _noteController.addListener(_validateForm);
+
+    if (_isEditMode) {
+      final expense = widget.expenseToEdit!;
+      _amountController.text = expense.amount.toString();
+      _categoryController.text = expense.category;
+      _noteController.text = expense.note;
+      _selectedDate = expense.date;
+      _validateForm();
+    }
   }
 
   @override
@@ -47,7 +59,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Add Expense')),
+      appBar: AppBar(title: Text(_isEditMode ? 'Edit Expense' : 'Add Expense')),
       body: Form(
         key: _formKey,
         child: ListView(
@@ -172,8 +184,8 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
-                icon: const Icon(Icons.add),
-                label: const Text('Add Expense'),
+                icon: Icon(_isEditMode ? Icons.save : Icons.add),
+                label: Text(_isEditMode ? 'Update Expense' : 'Add Expense'),
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   textStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
@@ -188,18 +200,21 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                         final isValid = _formKey.currentState!.validate();
                         if (isValid) {
                           _formKey.currentState?.save();
-                          Navigator.pop(
-                            context,
-                            Expense(
-                              amount: _amount ?? 0,
-                              category: _category ?? '',
-                              note: _note ?? '',
-                              date: _selectedDate!,
-                            ),
+                          final expense = Expense(
+                            id: _isEditMode ? widget.expenseToEdit!.id : null,
+                            amount: _amount ?? 0,
+                            category: _category ?? '',
+                            note: _note ?? '',
+                            date: _selectedDate!,
                           );
+                          Navigator.pop(context, expense);
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Expense added successfully!'),
+                            SnackBar(
+                              content: Text(
+                                _isEditMode
+                                    ? 'Expense updated successfully!'
+                                    : 'Expense added successfully!',
+                              ),
                             ),
                           );
                         }

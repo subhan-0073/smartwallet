@@ -52,4 +52,14 @@ class ExpenseDatabase {
     final db = await instance.database;
     await db.delete('expenses', where: 'id = ?', whereArgs: [id]);
   }
+
+  Future<void> updateExpense(Expense expense) async {
+    final db = await instance.database;
+    await db.update(
+      'expenses',
+      expense.toMap(),
+      where: 'id = ?',
+      whereArgs: [expense.id],
+    );
+  }
 }

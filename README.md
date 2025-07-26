@@ -126,7 +126,19 @@ SmartWallet is designed to help users:
 - [x] Added theme.dart for centralized theme management
 - [x] Added theme toggle in AppBar
 
-### 🔮 Milestone 7: Future-Ready Setup ⏳
+### ✏️ Milestone 7: Edit Functionality ✅
+
+> Allow users to modify existing expenses
+
+- [x] Implement edit functionality with pre-filled form data
+- [x] Add edit support via swipe right gesture
+- [x] Add edit option in long-press options dialog
+- [x] Create reusable dialog utilities in DialogUtils class
+- [x] Implement database update operations
+- [x] Add form validation for edit mode
+- [x] Show success feedback after editing
+
+### 🔮 Milestone 8: Future-Ready Setup ⏳
 
 > Lay the groundwork for upcoming features
 
