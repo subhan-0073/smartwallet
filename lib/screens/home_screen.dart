@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../screens/add_expense_screen.dart';
 import '../models/expense.dart';
@@ -131,6 +132,12 @@ class _HomeScreenState extends State<HomeScreen> {
             icon: Icon(_getThemeIcon()),
             onPressed: widget.toggleTheme,
             tooltip: _getThemeTooltip(),
+          ),
+          IconButton(
+            icon: Icon(Icons.logout),
+            onPressed: () {
+              FirebaseAuth.instance.signOut();
+            },
           ),
         ],
       ),

@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
-import 'screens/home_screen.dart';
+import 'screens/auth_gate.dart';
 import 'utils/theme.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
   runApp(SmartWallet());
 }
 
@@ -33,7 +38,7 @@ class _SmartWalletState extends State<SmartWallet> {
       theme: appLightTheme,
       darkTheme: appDarkTheme,
       themeMode: _themeMode,
-      home: HomeScreen(toggleTheme: toggleTheme, currentThemeMode: _themeMode),
+      home: AuthGate(toggleTheme: toggleTheme, currentThemeMode: _themeMode),
       debugShowCheckedModeBanner: false,
     );
   }

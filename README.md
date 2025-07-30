@@ -138,12 +138,17 @@ SmartWallet is designed to help users:
 - [x] Add form validation for edit mode
 - [x] Show success feedback after editing
 
-### 🔮 Milestone 8: Future-Ready Setup ⏳
+### 🔮 Milestone 8: Firebase Auth integration ✅
 
-> Lay the groundwork for upcoming features
+> Enable email/password login and begin Firestore migration from SQLite
 
-- [ ] Plan DB schema to support summaries and exports
-- [ ] Draft UI concepts for receipt OCR and shared tracking
+- [x] Firebase Authentication integration
+- [x] Login and register screens with validation
+- [x] AuthGate for automatic navigation
+- [x] Loading states and error handling
+- [x] Password security and input validation
+- [x] Logout functionality
+- [x] Started migration from SQLite to Firebase
 
 ---
 
