@@ -1,5 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Expense {
-  final int? id;
+  final String? id;
   final double amount;
   final String category;
   final String note;
@@ -19,17 +21,17 @@ class Expense {
       'amount': amount,
       'category': category,
       'note': note,
-      'date': date.toIso8601String(),
+      'date': Timestamp.fromDate(date),
     };
   }
 
   factory Expense.fromMap(Map<String, dynamic> map) {
     return Expense(
       id: map['id'],
-      amount: map['amount'],
+      amount: map['amount']?.toDouble(),
       category: map['category'],
       note: map['note'],
-      date: DateTime.parse(map['date']),
+      date: map['date'].toDate(),
     );
   }
 }

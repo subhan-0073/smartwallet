@@ -23,7 +23,6 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   List<Expense> expenses = [];
   bool isLoading = true;
-
   @override
   void initState() {
     super.initState();
@@ -52,16 +51,16 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     ];
     for (final expense in mockExpenses) {
-      await ExpenseDatabase.instance.insertExpense(expense);
+      await ExpenseFirestore.instance.insertExpense(expense);
     }
   }
 
   Future<void> _loadExpenses() async {
-    final dbExpenses = await ExpenseDatabase.instance.getExpenses();
+    final dbExpenses = await ExpenseFirestore.instance.getExpenses();
 
     if (dbExpenses.isEmpty) {
       await _insertMockData();
-      final newDbExpenses = await ExpenseDatabase.instance.getExpenses();
+      final newDbExpenses = await ExpenseFirestore.instance.getExpenses();
       setState(() {
         expenses = newDbExpenses;
         isLoading = false;
@@ -75,17 +74,17 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _addExpense(Expense expense) async {
-    await ExpenseDatabase.instance.insertExpense(expense);
+    await ExpenseFirestore.instance.insertExpense(expense);
     _loadExpenses();
   }
 
-  Future<void> _deleteExpense(int id) async {
-    await ExpenseDatabase.instance.deleteExpense(id);
+  Future<void> _deleteExpense(String id) async {
+    await ExpenseFirestore.instance.deleteExpense(id);
     _loadExpenses();
   }
 
   Future<void> _editExpense(Expense expense) async {
-    await ExpenseDatabase.instance.updateExpense(expense);
+    await ExpenseFirestore.instance.updateExpense(expense);
     _loadExpenses();
   }
 
