@@ -31,7 +31,7 @@ class ExpenseFirestore {
     final querySnapshot = await expensesCollection.get();
     return querySnapshot.docs.map((doc) {
       final data = doc.data() as Map<String, dynamic>;
-      return Expense.fromMap({'id': doc.id, ...data});
+      return Expense.fromMap(data);
     }).toList();
   }
 

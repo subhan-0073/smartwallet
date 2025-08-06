@@ -59,7 +59,10 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(_isEditMode ? 'Edit Expense' : 'Add Expense')),
+      appBar: AppBar(
+        title: Text(_isEditMode ? 'Edit Expense' : 'Add Expense'),
+        centerTitle: true,
+      ),
       body: Form(
         key: _formKey,
         child: ListView(
