@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:uuid/uuid.dart';
 import '../models/expense.dart';
 
@@ -22,13 +23,22 @@ class ExpenseFirestore {
       category: expense.category,
       note: expense.note,
       date: expense.date,
-    );
+      createdBy: expense.createdBy,
+    ).toMap();
 
-    await expensesCollection.doc(generatedId).set(expenseWithId.toMap());
+    expenseWithId.addAll({
+      'createdAt': FieldValue.serverTimestamp(),
+      'updatedAt': FieldValue.serverTimestamp(),
+    });
+
+    await expensesCollection.doc(generatedId).set(expenseWithId);
   }
 
   Future<List<Expense>> getExpenses() async {
-    final querySnapshot = await expensesCollection.get();
+    final user = FirebaseAuth.instance.currentUser!.uid;
+    final querySnapshot = await expensesCollection
+        .where('createdBy', isEqualTo: user)
+        .get();
     return querySnapshot.docs.map((doc) {
       final data = doc.data() as Map<String, dynamic>;
       return Expense.fromMap(data);
@@ -40,6 +50,9 @@ class ExpenseFirestore {
   }
 
   Future<void> updateExpense(Expense expense) async {
-    await expensesCollection.doc(expense.id).update(expense.toMap());
+    final updatedExpense = expense.toMap();
+    updatedExpense.remove('createdAt');
+    updatedExpense['updatedAt'] = FieldValue.serverTimestamp();
+    await expensesCollection.doc(expense.id).update(updatedExpense);
   }
 }

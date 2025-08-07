@@ -6,6 +6,9 @@ class Expense {
   final String category;
   final String note;
   final DateTime date;
+  final String createdBy;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
 
   Expense({
     this.id,
@@ -13,6 +16,9 @@ class Expense {
     required this.category,
     required this.note,
     required this.date,
+    required this.createdBy,
+    this.createdAt,
+    this.updatedAt,
   });
 
   Map<String, dynamic> toMap() {
@@ -22,6 +28,9 @@ class Expense {
       'category': category,
       'note': note,
       'date': Timestamp.fromDate(date),
+      'createdBy': createdBy,
+      'createdAt': createdAt,
+      'updatedAt': updatedAt,
     };
   }
 
@@ -32,6 +41,9 @@ class Expense {
       category: map['category'],
       note: map['note'],
       date: map['date'].toDate(),
+      createdBy: map['createdBy'] ?? '',
+      createdAt: map['createdAt']?.toDate(),
+      updatedAt: map['updatedAt']?.toDate(),
     );
   }
 }

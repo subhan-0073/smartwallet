@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../models/expense.dart';
 
@@ -209,6 +210,10 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                             category: _category ?? '',
                             note: _note ?? '',
                             date: _selectedDate!,
+                            createdBy: FirebaseAuth.instance.currentUser!.uid,
+                            createdAt: _isEditMode
+                                ? widget.expenseToEdit!.createdAt
+                                : null,
                           );
                           Navigator.pop(context, expense);
                           ScaffoldMessenger.of(context).showSnackBar(
